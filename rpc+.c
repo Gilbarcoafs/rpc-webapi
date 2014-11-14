@@ -10,6 +10,8 @@
 #define dir_name_base "base"
 #define file_export "/sys/class/gpio/export"
 #define file_unexport "/sys/class/gpio/unexport"
+#define str_in "in"
+#define str_out "out"
 
 bool gpio_get_gpio_count(int *gpio_count)
 {
@@ -159,10 +161,37 @@ bool gpio_set_direction(int gpio, gpio_direction_t direction)
   char file[255];
   memset(file, 0, sizeof(file));
   snprintf(file, sizeof(file)-1, dir_gpio "/gpio%i/direction", gpio);
-  return write_string_to_file(file, (direction == gpio_direction_in) ? "in" : "out");
+  return write_string_to_file(file, (direction == gpio_direction_in) ? str_in : str_out);
 }
 
-bool gpio_get_direction(int gpio, gpio_direction_t *direction);
+bool gpio_get_direction(int gpio, gpio_direction_t *direction)
+{
+  char buffer[255];
+  char filepath[255];
+  FILE *file;
+  bool ret = false;
+
+  memset(filepath, 0, sizeof(filepath));
+  snprintf(filepath, sizeof(filepath)-1, dir_gpio "/gpio%i/direction", gpio);
+
+  if ((file = fopen(filepath, "r")) != NULL)
+  {
+    if (fread(buffer, sizeof(char), sizeof(buffer), file) > 0)
+    {
+      if (strncmp(str_in, buffer, strlen(str_in)) == 0)
+      {
+        *direction = gpio_direction_in;
+        ret = true;
+      }
+      else if (strncmp(str_out, buffer, strlen(str_out)) == 0)
+      {
+        *direction = gpio_direction_out;
+        ret = true;
+      }
+    }
+  }
+  return ret;
+}
 
 bool gpio_set_value(int gpio, bool value)
 {
@@ -172,5 +201,33 @@ bool gpio_set_value(int gpio, bool value)
   return write_int_to_file(file, value ? 1 : 0);
 }
 
-bool gpio_get_value(int gpio, bool *value);
+bool gpio_get_value(int gpio, bool *value)
+{
+  char buffer[1];
+  char filepath[255];
+  bool ret = false;
+  FILE *file;
+
+  memset(filepath, 0, sizeof(filepath));
+  snprintf(filepath, sizeof(filepath)-1, dir_gpio "/gpio%i/value", gpio);
+
+  if ((file = fopen(filepath, "r")) != NULL)
+  {
+    if (fread(buffer, sizeof(char), sizeof(buffer), file) > 0)
+    {
+      if (strncmp("1", buffer, 1) == 0)
+      {
+        *value = true;
+        ret = true;
+      }
+      else if (strncmp("0", buffer, 1) == 0)
+      {
+        *value= false;
+        ret = true;
+      }
+    }
+  }
+
+  return ret;
+}
 
