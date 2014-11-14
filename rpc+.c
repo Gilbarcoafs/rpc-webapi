@@ -116,7 +116,7 @@ int gpio_get_gpios(int* gpios, int max_count)
   return index;
 }
 
-static bool write_to_file(const char *filepath, char *data, int count)
+static bool write_data_to_file(const char *filepath, char *data, int count)
 {
   bool ret = false;
   FILE* file = fopen(filepath, "r+w");
@@ -130,24 +130,24 @@ static bool write_to_file(const char *filepath, char *data, int count)
   return ret;
 }
 
-bool gpio_export(int gpio)
+static bool write_int_to_file(const char *filepath, int value)
 {
   int count;
   char buffer[255];
   memset(buffer, 0, sizeof(buffer));
-  count = snprintf(buffer, sizeof(buffer), "%i", gpio);
-  
-  return write_to_file(file_export, buffer, count);
+  count = snprintf(buffer, sizeof(buffer), "%i", value);
+
+  return write_data_to_file(filepath, buffer, count);
+}
+
+bool gpio_export(int gpio)
+{
+  return write_int_to_file(file_export, gpio);
 }
 
 bool gpio_unexport(int gpio)
 {
-  int count;
-  char buffer[255];
-  memset(buffer, 0, sizeof(buffer));
-  count = snprintf(buffer, sizeof(buffer), "%i", gpio);
-
-  return write_to_file(file_unexport, buffer, count);
+  return write_int_to_file(file_unexport, gpio);
 }
 
 //bool gpio_set_value(int gpio, bool value);
