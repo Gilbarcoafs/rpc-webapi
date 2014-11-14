@@ -9,21 +9,13 @@ typedef struct {
 
 static config_t m_config = { true };
 
-//static const char uri_gpio[] = "/gpio";
-//static const char uri_gpio_export[] = "/gpio/export";
-//static const char uri_gpio_unexport[] = "/gpio/unexport";
-//static const char uri_gpio_value_set[] = "/gpio/value/set";
-//static const char uri_gpio_value_get[] = "/gpio/value/get";
-
-#define uri_gpio "/gpio"
-#define uri_gpio_export uri_gpio "/export"
-#define uri_gpio_unexport uri_gpio "/unexport"
-#define uri_gpio_value uri_gpio "/value"
-#define uri_gpio_value_get uri_gpio_value "/get"
-#define uri_gpio_value_set uri_gpio_value "/set"
-#define uri_gpio_direction uri_gpio "/direction"
-#define uri_gpio_direcetion_get uri_gpio_direction "/get"
-#define uri_gpio_direction_set uri_gpio_direction "/set"
+#define uri_gpio_get           "/gpio/get"
+#define uri_gpio_export        "/gpio/export"
+#define uri_gpio_unexport      "/gpio/unexport"
+#define uri_gpio_value_get     "/gpio/value/get"
+#define uri_gpio_value_set     "/gpio/value/set"
+#define uri_gpio_direction_get "/gpio/direction/get"
+#define uri_gpio_direction_set "/gpio/direction/set"
 
 #define is_request(req) (strncmp(conn->uri, req, sizeof(req)) == 0)
 
@@ -34,7 +26,9 @@ static int ev_handler(struct mg_connection *conn, enum mg_event ev)
 
   switch (ev) {
     case MG_REQUEST:
-      if (is_request(uri_gpio_export))
+      if (is_request(uri_gpio_get))
+        printf("gpio get\n");
+      else if (is_request(uri_gpio_export))
         printf("gpio export\n");
       else if (is_request(uri_gpio_unexport))
         printf("gpio unexport\n");
@@ -42,6 +36,10 @@ static int ev_handler(struct mg_connection *conn, enum mg_event ev)
         printf("gpio value get\n");
       else if (is_request(uri_gpio_value_set))
         printf("gpio value set\n");
+      else if (is_request(uri_gpio_direction_get))
+        printf("gpio direction get\n");
+      else if (is_request(uri_gpio_direction_set))
+        printf("gpio direction set\n");
 
       /* */
       mg_send_data(conn, NULL, 0);
