@@ -116,7 +116,7 @@ int gpio_get_gpios(int* gpios, int max_count)
   return index;
 }
 
-static bool write_data_to_file(const char *filepath, char *data, int count)
+static bool write_data_to_file(const char *filepath, const char *data, int count)
 {
   bool ret = false;
   FILE* file = fopen(filepath, "r+w");
@@ -130,13 +130,17 @@ static bool write_data_to_file(const char *filepath, char *data, int count)
   return ret;
 }
 
+static bool write_string_to_file(const char *filepath, const char *string)
+{
+  write_data_to_file(filepath, string, strlen(string));
+}
+
 static bool write_int_to_file(const char *filepath, int value)
 {
   int count;
   char buffer[255];
   memset(buffer, 0, sizeof(buffer));
-  count = snprintf(buffer, sizeof(buffer), "%i", value);
-
+  count = snprintf(buffer, sizeof(buffer)-1, "%i", value);
   return write_data_to_file(filepath, buffer, count);
 }
 
@@ -150,9 +154,23 @@ bool gpio_unexport(int gpio)
   return write_int_to_file(file_unexport, gpio);
 }
 
-//bool gpio_set_value(int gpio, bool value);
-//bool gpio_get_value(int gpio, bool *value);
-//typedef enum { in, out } gpio_direction_t;
-//bool gpio_set_direction(int gpio, gpio_direction_t direction);
-//bool gpio_get_direction(int gpio, gpio_direction_t *direction);
+bool gpio_set_direction(int gpio, gpio_direction_t direction)
+{
+  char file[255];
+  memset(file, 0, sizeof(file));
+  snprintf(file, sizeof(file)-1, dir_gpio "/gpio%i/direction", gpio);
+  return write_string_to_file(file, (direction == gpio_direction_in) ? "in" : "out");
+}
+
+bool gpio_get_direction(int gpio, gpio_direction_t *direction);
+
+bool gpio_set_value(int gpio, bool value)
+{
+  char file[255];
+  memset(file, 0, sizeof(file));
+  snprintf(file, sizeof(file)-1, dir_gpio "/gpio%i/value", gpio);
+  return write_int_to_file(file, value ? 1 : 0);
+}
+
+bool gpio_get_value(int gpio, bool *value);
 

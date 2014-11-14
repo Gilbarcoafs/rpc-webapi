@@ -7,6 +7,6 @@ bool gpio_export(int gpio);
 bool gpio_unexport(int gpio);
 bool gpio_set_value(int gpio, bool value);
 bool gpio_get_value(int gpio, bool *value);
-typedef enum { in, out } gpio_direction_t;
+typedef enum { gpio_direction_in, gpio_direction_out } gpio_direction_t;
 bool gpio_set_direction(int gpio, gpio_direction_t direction);
 bool gpio_get_direction(int gpio, gpio_direction_t *direction);
