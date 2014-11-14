@@ -26,13 +26,12 @@ bool gpio_get_gpio_count(int *gpio_count)
   {
     while((entry = readdir(dir)) != NULL)
     {
-      //printf("entry->d_name: %s\n", entry->d_name);
       /* look for gpiochip directories... */
       if (strncmp(entry->d_name, dir_name_gpiochip, strlen(dir_name_gpiochip)) == 0)
       {
         /* try to read their ngpio file */
         snprintf(filepath, sizeof(filepath), "%s/%s/%s", dir_gpio, entry->d_name, dir_name_ngpio);
-        printf("ngpio: %s\n", filepath);
+        //printf("ngpio: %s\n", filepath);
         file = fopen(filepath, "r");
         if (file != NULL)
         {
@@ -53,6 +52,7 @@ bool gpio_get_gpio_count(int *gpio_count)
   }
 
   *gpio_count = count;
+  return count != 0;
 }
 
 //bool gpio_get_gpios(int* gpios, int max_count);
