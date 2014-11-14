@@ -12,4 +12,4 @@ ssh %ssh_param% pi@%IP% "pkill \"rpc\\+webapi\""
 @scp %ssh_param% ../rpc+webapi pi@%IP%:~/
 
 :: start the webapi
-@ssh %ssh_param% pi@%IP% "chmod +x rpc+webapi; ./rpc+webapi"
+::@ssh %ssh_param% pi@%IP% "chmod +x rpc+webapi; ./rpc+webapi"

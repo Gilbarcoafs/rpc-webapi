@@ -1,12 +1,11 @@
 #include "rpc+.h"
 #include <dirent.h>
 
-bool gpio_get_gpio_count(int *gpio_count)
-{
+//bool gpio_get_gpio_count(int *gpio_count)
+//{
   /* get the number of all gpios by enumerating all gpio chips */
-  DIR *dir = opendir("/sys/class/gpio");
-
-}
+  //DIR *dir = opendir("/sys/class/gpio");
+//}
 //bool gpio_get_gpios(int* gpios, int max_count);
 //bool gpio_export(int gpio);
 //bool gpio_unexport(int gpio);
