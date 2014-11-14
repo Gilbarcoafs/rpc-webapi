@@ -19,17 +19,60 @@ static config_t m_config = { true };
 
 #define is_request(req) (strncmp(conn->uri, req, sizeof(req)) == 0)
 
+static int get_query_param(const char *param, const char *query, char *value, int max_count)
+{
+  int i=0, value_index = 0;
+  int param_length = strlen(param);
+  /* is it a valid query string? */
+
+  printf("query: %s\n", query);
+
+  if (query != NULL)
+  {
+    /* search within the query string */
+    while (query[i] != '\0')
+    {
+      printf("i: %i\n",i);
+      /* if the query starts with the parameter */
+      if (i == 0 || query[i-1] == '&')
+        if(strncmp(query+i, param, param_length) == 0)
+        {
+          /* if the param is followed by a '=' */
+          if (query[i+param_length] == '=')
+          {
+            /* copy the value */
+            for (value_index = 0; 
+              value_index <= max_count && /* as long as the user has space */
+              query[i+param_length+1+value_index] != '&' && /* until the next parameter starts */
+              query[i+param_length+1+value_index] != '\0'; /* or query's end is reached */
+              value_index++)
+            {
+              value[value_index] = query[i+param_length+1+value_index];
+            }
+          }
+        }
+
+      i++;
+    }
+  }
+  return value_index;
+}
+
 static int ev_handler(struct mg_connection *conn, enum mg_event ev)
 {
-  int len;
-  char *req;
-
+  char param1[255], param2[255];
   switch (ev) {
     case MG_REQUEST:
       if (is_request(uri_gpio_get))
         printf("gpio get\n");
       else if (is_request(uri_gpio_export))
+      {
         printf("gpio export\n");
+        if (get_query_param("gpio", conn->query_string, param1, sizeof(param1)) > 0)
+          printf("get_query_param('gpio') succeeded: %s\n", param1);
+        else
+          printf("get_query_param('gpio') failed.\n");
+      }
       else if (is_request(uri_gpio_unexport))
         printf("gpio unexport\n");
       else if (is_request(uri_gpio_value_get))
