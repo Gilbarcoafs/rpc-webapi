@@ -2,7 +2,7 @@
 
 /* gpio functions */
 bool gpio_get_gpio_count(int *gpio_count);
-bool gpio_get_gpios(int* gpios, int max_count);
+int gpio_get_gpios(int* gpios, int max_count);
 bool gpio_export(int gpio);
 bool gpio_unexport(int gpio);
 bool gpio_set_value(int gpio, bool value);
