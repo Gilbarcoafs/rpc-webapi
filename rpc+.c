@@ -8,6 +8,8 @@
 #define dir_name_gpiochip "gpiochip"
 #define dir_name_ngpio "ngpio"
 #define dir_name_base "base"
+#define file_export "/sys/class/gpio/export"
+#define file_unexport "/sys/class/gpio/unexport"
 
 bool gpio_get_gpio_count(int *gpio_count)
 {
@@ -114,7 +116,25 @@ int gpio_get_gpios(int* gpios, int max_count)
   return index;
 }
 
-//bool gpio_export(int gpio);
+bool gpio_export(int gpio)
+{
+  char buffer[255];
+  int count;
+  bool ret = false;
+
+  memset(buffer, 0, sizeof(buffer));
+  count = snprintf(buffer, sizeof(buffer), "%i", gpio);
+
+  FILE* file = fopen(file_export, "r+w");
+
+  if (file != NULL)
+  {
+    fwrite(buffer, sizeof(char), count, file);
+    fclose(file);
+    ret = true;
+  }
+}
+
 //bool gpio_unexport(int gpio);
 //bool gpio_set_value(int gpio, bool value);
 //bool gpio_get_value(int gpio, bool *value);
