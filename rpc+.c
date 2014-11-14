@@ -116,26 +116,40 @@ int gpio_get_gpios(int* gpios, int max_count)
   return index;
 }
 
-bool gpio_export(int gpio)
+static bool write_to_file(const char *filepath, char *data, int count)
 {
-  char buffer[255];
-  int count;
   bool ret = false;
-
-  memset(buffer, 0, sizeof(buffer));
-  count = snprintf(buffer, sizeof(buffer), "%i", gpio);
-
-  FILE* file = fopen(file_export, "r+w");
+  FILE* file = fopen(filepath, "r+w");
 
   if (file != NULL)
   {
-    fwrite(buffer, sizeof(char), count, file);
+    fwrite(data, sizeof(char), count, file);
     fclose(file);
     ret = true;
   }
+  return ret;
 }
 
-//bool gpio_unexport(int gpio);
+bool gpio_export(int gpio)
+{
+  int count;
+  char buffer[255];
+  memset(buffer, 0, sizeof(buffer));
+  count = snprintf(buffer, sizeof(buffer), "%i", gpio);
+  
+  return write_to_file(file_export, buffer, count);
+}
+
+bool gpio_unexport(int gpio)
+{
+  int count;
+  char buffer[255];
+  memset(buffer, 0, sizeof(buffer));
+  count = snprintf(buffer, sizeof(buffer), "%i", gpio);
+
+  return write_to_file(file_unexport, buffer, count);
+}
+
 //bool gpio_set_value(int gpio, bool value);
 //bool gpio_get_value(int gpio, bool *value);
 //typedef enum { in, out } gpio_direction_t;
