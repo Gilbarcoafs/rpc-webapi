@@ -1,0 +1,162 @@
+<html>
+  <head title="rpc+ web api" >
+    <script src="knockout-3.2.0.js"></script>
+    <script src="jquery-2.1.1.min.js"></script>
+    <script src="bootstrap.min.js"></script>
+    <link href="bootstrap.min.css" type="text/css" rel="stylesheet"/>
+  </head>
+
+  <body>
+    <nav class="navbar navbar-inverse" role="navigation">
+      <div class="container">
+        <div class="navbar-header">
+          <a class="navbar-brand" href="index.html">RasPiComm+ WebApi</a>
+          <ul class="nav navbar-nav">
+            <li><a href="index_gpio.html">GPIOs</a></li>
+            <li class="disabled"><a href="index_ia.html">Analog Inputs</a></li>
+            <li class="disabled"><a href="index_uart.html">UARTs</a></li>
+            <li class="disabled"><a href="index_modules.html">Modules</a></li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+  <!--  <div>
+    <h4>examples</h4>
+    <ul>
+      <li>export gpio 3: <a href="gpio/export?gpio=3">gpio/export?gpio=3</a></li>
+      <li>unexport gpio 3: <a href="gpio/unexport?gpio=3">gpio/unexport?gpio=3</a></li>
+      <li>set gpio 3 direction out: <a href="gpio/direction/set?gpio=3&direction=out">gpio/direction/set?gpio=3&direction=out</a></li>
+      <li>set gpio 3 direction in: <a href="gpio/direction/set?gpio=3&direction=in">gpio/direction/set?gpio=3&direction=in</a></li>
+      <li>get gpio 3 value: <a href="gpio/value/get?gpio=3">gpio/value/get?gpio=3</a></li>
+      <li>set gpio 3 value high: <a href="gpio/value/set?gpio=3&value=1">gpio/value/set?gpio=3&value=1</a></li>
+      <li>set gpio 3 value low: <a href="gpio/value/set?gpio=3&value=0">gpio/value/set?gpio=3&value=0</a></li>
+    </ul>
+    </div>
+  -->
+
+    <div class="container">
+      <h2>GPIOs</h2>
+      <p>The gpio web api interface allows controlling the gpios using simple GET requests.</p>
+      <p>Click the buttons below to try them out!</p>
+    </div>
+
+    <div class="container" id="gpio_api">
+
+      <div class="panel panel-default">
+        <div class="panel-heading">
+        <div class="row">
+          <div class="col-sm-3">
+            <div>
+              <b>Configure the GPIO</b>
+            </div>
+          </div>
+          <div class="col-sm-3">
+            <select id="selectGPIO" class="form-control" data-bind="options: gpio_values, value: gpio" ></select>
+          </div>
+        </div>
+        </div>
+        <div class="panel-body">
+          <p class="btn-group" >
+            <p><button type="button" class="btn btn-default" data-bind="click: export_click">export</button></p>
+            <p><button type="button" class="btn btn-default" data-bind="click: unexport_click">unexport</button></p>
+            <p>
+              <button type="button" class="btn btn-default" data-bind="click: get_direction_click">get direction</button>
+              <label data-bind="text: direction"></label>
+              <span class="alert alert-info" style="display:none" data-bind="visible: direction() === ''"><b>Export the GPIO</b> Export the gpio before getting the direction!</span>
+            </p>
+
+            <p>
+              <button type="button" class="btn btn-default col-sm-4" data-bind="click: set_direction_click">set direction</button>
+              <p class="col-sm-3">
+                <select class="form-control" data-bind="options: direction_values, value: direction_new"></select>
+              </p>
+            </p>
+
+            <p>
+              <button type="button" class="btn btn-default" data-bind="click: get_value_click">get value</button>
+              <label data-bind="text: (value() === '0') ? 'low' : (value() === '1' ) ? 'high' : '' "></label>
+            </p>
+            
+            <div class="row">
+              <div class="col-sm-2">
+                <button type="button" class="btn btn-default" data-bind="click: set_value_click, enable: direction() === 'out'">set value</button>
+              </div>
+              <div class="col-sm-4">
+                <select class="form-control" data-bind="options: output_values, value: value_new, enable: direction() === 'out'"></select>
+              </div>
+            </div>
+            
+            <p>
+              <div class="alert alert-info" style="display:none" data-bind="visible: direction() !== 'out'"><b>Set as Output</b> Set the GPIO as an output before setting the value!</div>
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel panel-default">
+        <div class="panel-heading"><b>GPIO functions</b></div>
+        <div class="panel-body">
+          <p>export gpios, eg. <a href="/gpio/export?gpio=2">/gpio/export?gpio=2</a></p>
+          <p>unexport gpios</p>
+          <p>get direction</p>
+          <p>set direction</p>
+          <p>get value</p>
+          <p>set value</p>
+        </div>
+      </div>
+    </div>
+
+    <script type="text/javascript">
+    function getVm() {
+      var vm = {
+        gpio: ko.observable(2),
+        gpio_values: ko.observableArray([2, 3, 55, 56, 57, 58, 59, 60, 61, 62]),
+        direction: ko.observable(''),
+        direction_new: ko.observable(''),
+        direction_values: ko.observableArray( ['in', 'out']),
+        value: ko.observable(''),
+        value_new: ko.observable(''),
+        output_values: ko.observableArray( ['low', 'high'] ),
+        export_click: function () {
+          $.ajax('/gpio/export?gpio=' + vm.gpio(), { async: true });
+          vm.update();
+        },
+        unexport_click: function () {
+          $.ajax('/gpio/unexport?gpio=' + vm.gpio(), {});
+          vm.update();
+        },
+        get_direction_click: function () {
+          $.ajax('/gpio/direction/get?gpio=' + vm.gpio(), { async: true, success: function (data) { vm.direction(data); } });
+        },
+        set_direction_click: function () {
+          $.ajax('/gpio/direction/set?gpio=' + vm.gpio() + '&direction=' + vm.direction_new(), { async: false });
+          vm.update();
+        },
+        get_value_click: function () {
+          $.ajax('/gpio/value/get?gpio=' + vm.gpio(), { async: true, success: function (data) { vm.value(data); } });
+        },
+        set_value_click: function () {
+          var url = '/gpio/value/set?gpio=' + vm.gpio() + '&value=' + ((vm.value_new() === 'low') ? '0' : '1');
+          $.ajax(url, { async: true });
+          vm.get_value_click();
+        },
+
+        update: function () {
+          vm.get_direction_click();
+          vm.get_value_click();
+        }
+      };
+
+      vm.update();
+      vm.gpio.subscribe(function (newValue) { vm.update(); });
+
+      return vm;
+    };
+
+    ko.applyBindings(getVm(), document.getElementById('gpio_api'));
+
+    </script>
+
+  </body>
+</html>

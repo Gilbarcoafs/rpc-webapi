@@ -43,5 +43,14 @@
     <None Include="..\content\jquery-2.1.1.min.js">
       <Filter>content</Filter>
     </None>
+    <None Include="..\content\bootstrap.min.css">
+      <Filter>content</Filter>
+    </None>
+    <None Include="..\content\bootstrap.min.js">
+      <Filter>content</Filter>
+    </None>
+    <None Include="..\content\index_gpio.html">
+      <Filter>content</Filter>
+    </None>
   </ItemGroup>
 </Project>

@@ -1,113 +1,47 @@
 <html>
-<head title="rpc+ web api">
-  <script src="knockout-3.2.0.js"></script>
-  <script src="jquery-2.1.1.min.js"></script>
-</head>
+  <head title="rpc+ web api" >
+    <script src="knockout-3.2.0.js"></script>
+    <script src="jquery-2.1.1.min.js"></script>
+    <script src="bootstrap.min.js"></script>
+    <link href="bootstrap.min.css" type="text/css" rel="stylesheet"/>
+  </head>
 
-<body>
+  <body>
+    <nav class="navbar navbar-inverse" role="navigation">
+      <div class="container">
+        <div class="navbar-header">
+          <a class="navbar-brand" href="index.html">RasPiComm+ WebApi</a>
+          <ul class="nav navbar-nav">
+            <li><a href="index_gpio.html">GPIOs</a></li>
+            <li class="disabled"><a href="index_ia.html">Analog Inputs</a></li>
+            <li class="disabled"><a href="index_uart.html">UARTs</a></li>
+            <li class="disabled"><a href="index_modules.html">Modules</a></li>
+          </ul>
+        </div>
+      </div>
+    </nav>
 
-  <div>
-  <h1>rpc+ web api</h1>
-  the rpc+ webapi supports the following functions:
-  <h3>gpio functions</h3>
-  <ul>
-  <li>gpio export</li>
-  <li>gpio unexport</li>
-  <li>gpio direction get</li>
-  <li>gpio direction set</li>
-  <li>gpio value get</li>
-  <li>gpio value set</li>
-  </ul>
-  </div>
-
-<!--  <div>
-  <h4>examples</h4>
-  <ul>
-    <li>export gpio 3: <a href="gpio/export?gpio=3">gpio/export?gpio=3</a></li>
-    <li>unexport gpio 3: <a href="gpio/unexport?gpio=3">gpio/unexport?gpio=3</a></li>
-    <li>set gpio 3 direction out: <a href="gpio/direction/set?gpio=3&direction=out">gpio/direction/set?gpio=3&direction=out</a></li>
-    <li>set gpio 3 direction in: <a href="gpio/direction/set?gpio=3&direction=in">gpio/direction/set?gpio=3&direction=in</a></li>
-    <li>get gpio 3 value: <a href="gpio/value/get?gpio=3">gpio/value/get?gpio=3</a></li>
-    <li>set gpio 3 value high: <a href="gpio/value/set?gpio=3&value=1">gpio/value/set?gpio=3&value=1</a></li>
-    <li>set gpio 3 value low: <a href="gpio/value/set?gpio=3&value=0">gpio/value/set?gpio=3&value=0</a></li>
-  </ul>
-  </div>
--->
-  <div id="gpio_api">
-    <label>gpio</label>
-    <select data-bind="options: gpio_values, value: gpio"></select>
-    <div>
-      <button data-bind="click: export_click">export</button>
-      <button data-bind="click: unexport_click">unexport</button>
+    <div class="container">
+      <div class="row">
+        <h1>WebApi</h1>
+        <p>The RasPiComm+ WebApi exposes functionality of the Raspberry Pi, the RasPiComm+ and the its modules over a Rest WebApi.</p>
+        <p>It is a <b>simple, open-source</b> webapi that can be used out of the box on your raspberry pi without any dependencies. It even includes its own web-server, based on the open source webserver <a href="https://github.com/cesanta/mongoose">mongoose</a>.</p>
+        <p>Support for the following sub systems are provided:</p>
+        <h2>GPIOs</h2>
+        <p>The following gpio actions are supported: export, unexport, get direction, set direction, get value, set value.</p>
+        <p>For examples and a live demo if you're running it on your raspberry pi, click <a href="index_gpio.html">here</a>.</p>
+        <p><a class="btn btn-primary btn-lg" href="index_gpio.html" role="button">More about GPIOs »</a></p>
+        <h2>Analog Inputs</h2>
+        <p><b>coming soon...</b></p>
+        <p><a class="btn btn-primary btn-lg disabled" href="index_ia.html" role="button">More about Analog Inputs »</a></p>
+        <h2>UARTs</h2>
+        <p><b>coming soon...</b></p>
+        <p><a class="btn btn-primary btn-lg disabled" href="index_uart.html" role="button">More about UARTs »</a></p>
+        <h2>Modules</h2>
+        <p>Shows info about the inserted modules and allows viewing and editing of the eeprom data.</p>
+        <p><b>coming soon...</b></p>
+        <p><a class="btn btn-primary btn-lg disabled" href="index_uart.html" role="button">More about the Modules »</a></p>
+      </div>
     </div>
-    <div>
-      <button data-bind="click: get_direction_click">get direction</button>
-      <label data-bind="text: direction"></label>
-    </div>
-    <div>
-      <button data-bind="click: set_direction_click">set direction</button>
-      <select data-bind="options: direction_values, value: direction_new"></select>
-    </div>
-    <div>
-      <button data-bind="click: get_value_click">get value</button>
-      <label data-bind="text: value"></label>
-    </div>
-    <div>
-      <button data-bind="click: set_value_click, enable: direction() === 'out'">set value</button>
-      <select data-bind="options: output_values, value: value_new, enable: direction() === 'out'"></select>
-    </div>
-  </div>
-
-  <script type="text/javascript">
-  function getVm() {
-    var vm = {
-      gpio: ko.observable(2),
-      gpio_values: ko.observableArray([2, 3, 55, 56, 57, 58, 59, 60, 61, 62]),
-      direction: ko.observable(''),
-      direction_new: ko.observable(''),
-      direction_values: ko.observableArray( ['in', 'out']),
-      value: ko.observable(''),
-      value_new: ko.observable(''),
-      output_values: ko.observableArray( ['low', 'high'] ),
-      export_click: function () {
-        $.ajax('/gpio/export?gpio=' + vm.gpio(), { async: true });
-        vm.update();
-      },
-      unexport_click: function () {
-        $.ajax('/gpio/unexport?gpio=' + vm.gpio(), {});
-        vm.update();
-      },
-      get_direction_click: function () {
-        $.ajax('/gpio/direction/get?gpio=' + vm.gpio(), { async: true, success: function (data) { vm.direction(data); } });
-      },
-      set_direction_click: function () {
-        $.ajax('/gpio/direction/set?gpio=' + vm.gpio() + '&direction=' + vm.direction_new(), { async: false });
-        vm.update();
-      },
-      get_value_click: function () {
-        $.ajax('/gpio/value/get?gpio=' + vm.gpio(), { async: true, success: function (data) { vm.value(data); } });
-      },
-      set_value_click: function () {
-        var url = '/gpio/value/set?gpio=' + vm.gpio() + '&value=' + ((vm.value_new() === 'low') ? '0' : '1');
-        $.ajax(url, { async: true });
-        vm.get_value_click();
-      },
-
-      update: function () {
-        vm.get_direction_click();
-        vm.get_value_click();
-      }
-    };
-
-    vm.update();
-    vm.gpio.subscribe(function (newValue) { vm.update(); });
-
-    return vm;
-  };
-
-  ko.applyBindings(getVm(), document.getElementById('gpio_api'));
-
-  </script>
-
-</body>
+  </body>
 </html>
