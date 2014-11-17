@@ -70,15 +70,18 @@
       output_values: ko.observableArray( ['low', 'high'] ),
       export_click: function () {
         $.ajax('/gpio/export?gpio=' + vm.gpio(), { async: true });
+        vm.update();
       },
       unexport_click: function () {
-        $.ajax('/gpio/unexport?gpio=' + vm.gpio(), { async: true });
+        $.ajax('/gpio/unexport?gpio=' + vm.gpio(), {});
+        vm.update();
       },
       get_direction_click: function () {
         $.ajax('/gpio/direction/get?gpio=' + vm.gpio(), { async: true, success: function (data) { vm.direction(data); } });
       },
       set_direction_click: function () {
-        $.ajax('/gpio/direction/set?gpio=' + vm.gpio() + '&direction=' + vm.direction_new(), { async: true });
+        $.ajax('/gpio/direction/set?gpio=' + vm.gpio() + '&direction=' + vm.direction_new(), { async: false });
+        vm.get_direction_click();
       },
       get_value_click: function () {
         $.ajax('/gpio/value/get?gpio=' + vm.gpio(), { async: true, success: function (data) { vm.value(data); } });
@@ -86,8 +89,16 @@
       set_value_click: function () {
         var url = '/gpio/value/set?gpio=' + vm.gpio() + '&value=' + ((vm.value_new() === 'in') ? '0' : '1');
         $.ajax(url, { async: true });
+        vm.get_value_click();
+      },
+
+      update: function () {
+        vm.get_direction_click();
+        vm.get_value_click();
       }
     };
+
+    vm.gpio.subscribe(function (newValue) { vm.update(); });
 
     ko.applyBindings(vm, document.getElementById('gpio_api'));
   })();
