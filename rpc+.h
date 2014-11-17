@@ -1,3 +1,4 @@
+/* written by mdk at amescon.com */
 #include <stdint.h>
 
 /* gpio functions */

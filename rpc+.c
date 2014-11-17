@@ -1,3 +1,4 @@
+/* written by mdk at amescon.com */
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -161,6 +162,7 @@ bool gpio_set_direction(int gpio, gpio_direction_t direction)
   char file[255];
   memset(file, 0, sizeof(file));
   snprintf(file, sizeof(file)-1, dir_gpio "/gpio%i/direction", gpio);
+
   return write_string_to_file(file, (direction == gpio_direction_in) ? str_in : str_out);
 }
 
