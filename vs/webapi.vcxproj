@@ -21,6 +21,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="..\content\index.html" />
+    <None Include="..\content\jquery-2.1.1.min.js" />
     <None Include="..\content\knockout-3.2.0.js" />
     <None Include="build.bat" />
     <None Include="deploy.bat" />

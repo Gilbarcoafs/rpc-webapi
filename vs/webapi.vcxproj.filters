@@ -40,5 +40,8 @@
     <None Include="..\content\index.html">
       <Filter>content</Filter>
     </None>
+    <None Include="..\content\jquery-2.1.1.min.js">
+      <Filter>content</Filter>
+    </None>
   </ItemGroup>
 </Project>

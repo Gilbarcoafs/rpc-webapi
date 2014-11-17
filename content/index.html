@@ -1,6 +1,7 @@
 <html>
 <head title="rpc+ web api">
   <script src="knockout-3.2.0.js"></script>
+  <script src="jquery-2.1.1.min.js"></script>
 </head>
 
 <body>
@@ -33,25 +34,58 @@
   </div>
 -->
   <div id="gpio_api">
-    <label>gpio:</label>
+    <label>gpio</label>
     <input data-bind="value: gpio" />
-    <button data-bind="click: export_click()">export</button>
-    <button data-bind="click: unexport_click()">unexport</button>
-    <button data-bind="click: get_direction_click()">get direction</button>
-    <button data-bind="click: get_value_click()">get value</button>
+    <div>
+      <button data-bind="click: export_click()">export</button>
+      <button data-bind="click: unexport_click()">unexport</button>
+    </div>
+    <div>
+      <button data-bind="click: get_direction_click()">get direction</button>
+      <label data-bind="text: direction"></label>
+    </div>
+    <div>
+      <button data-bind="click: set_direction_click()">set direction</button>
+      <select data-bind="options: direction_values, value: direction_new"></select>
+    </div>
+    <div>
+      <button data-bind="click: get_value_click()">get value</button>
+      <label data-bind="text: value"></label>
+    </div>
+    <div>
+      <button data-bind="click: set_value_click()">set value</button>
+      <select data-bind="options: output_values, value: value_new"></select>
+    </div>
   </div>
 
   <script type="text/javascript">
   (function() {
     var vm = {
       gpio: ko.observable(2),
+      direction: ko.observable(''),
+      direction_new: ko.observable(''),
+      direction_values: ko.observableArray( ['in', 'out']),
+      value: ko.observable(''),
+      value_new: ko.observable(''),
+      output_values: ko.observableArray( ['low', 'high'] ),
       export_click: function () {
+        $.ajax('/gpio/export?gpio=' + vm.gpio(), { async: true });
       },
-      unexport_click: function() {
+      unexport_click: function () {
+        $.ajax('/gpio/unexport?gpio=' + vm.gpio(), { async: true });
       },
-      get_direction_click: function() {
+      get_direction_click: function () {
+        $.ajax('/gpio/direction/get?gpio=' + vm.gpio(), { async: true, success: function (data) { vm.direction(data); } });
+      },
+      set_direction_click: function () {
+        $.ajax('/gpio/direction/set?gpio=' + vm.gpio() + '&direction=' + vm.direction_new(), { async: true });
       },
       get_value_click: function () {
+        $.ajax('/gpio/value/get?gpio=' + vm.gpio(), { async: true, success: function (data) { vm.value(data); } });
+      },
+      set_value_click: function () {
+        var url = '/gpio/value/set?gpio=' + vm.gpio() + '&value=' + ((vm.value_new() === 'in') ? '0' : '1');
+        $.ajax(url, { async: true });
       }
     };
 

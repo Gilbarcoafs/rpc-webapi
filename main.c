@@ -10,7 +10,7 @@ typedef struct {
 } config_t;
 
 static config_t m_config = { true };
-static const char *m_content_files[] = { "index.html", "knockout-3.2.0.js" };
+static const char *m_content_files[] = { "index.html", "knockout-3.2.0.js", "jquery-2.1.1.min.js" };
 #define content_file_count (sizeof(m_content_files)/sizeof(char*))
 
 #define uri_index              "/"
