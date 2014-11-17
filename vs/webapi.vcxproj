@@ -20,6 +20,8 @@
     <ClInclude Include="..\rpc+.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\content\index.html" />
+    <None Include="..\content\knockout-3.2.0.js" />
     <None Include="build.bat" />
     <None Include="deploy.bat" />
   </ItemGroup>

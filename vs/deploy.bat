@@ -10,6 +10,7 @@ ssh %ssh_param% pi@%IP% "pkill \"rpc\\+webapi\""
 
 :: copy the webapi to the rpi
 @scp %ssh_param% ../rpc+webapi pi@%IP%:~/
+@scp %ssh_param% -r ../content pi@%IP%:~/
 
 :: start the webapi
 ::@ssh %ssh_param% pi@%IP% "chmod +x rpc+webapi; ./rpc+webapi"

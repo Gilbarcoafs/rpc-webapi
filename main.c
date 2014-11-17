@@ -10,7 +10,11 @@ typedef struct {
 } config_t;
 
 static config_t m_config = { true };
+static const char *m_content_files[] = { "knockout-3.2.0.js" };
+#define content_file_count (sizeof(m_content_files)/sizeof(char*))
 
+#define uri_index              "/"
+#define uri_content            "/content"
 #define uri_gpio_get           "/gpio/get"
 #define uri_gpio_export        "/gpio/export"
 #define uri_gpio_unexport      "/gpio/unexport"
@@ -30,6 +34,8 @@ static config_t m_config = { true };
 
 typedef enum {
   request_unknown,
+  request_index,
+  request_content,
   request_gpio_get,
   request_gpio_export,
   request_gpio_unexport,
@@ -42,46 +48,58 @@ typedef enum {
 static request_t get_request_type(const char *uri)
 {
   request_t ret;
-  if (is_request(uri, uri_gpio_get))
+  ON_DEBUG(printf("uri: %s -> ", uri));
+  if (is_request(uri, uri_index))
+  {
+    ret = request_index;
+    ON_DEBUG(printf("request_index"))
+  }
+  else if (is_request(uri, uri_content))
+  {
+    ret = request_content;
+    ON_DEBUG(printf("request_content"));
+  }
+  else if (is_request(uri, uri_gpio_get))
   {
     ret = request_gpio_get;
-    ON_DEBUG(printf("request_gpio_get\n"));
+    ON_DEBUG(printf("request_gpio_get"));
   }
   else if (is_request(uri, uri_gpio_export))
   {
     ret = request_gpio_export;
-    ON_DEBUG(printf("request_gpio_export\n"));
+    ON_DEBUG(printf("request_gpio_export"));
   }
   else if (is_request(uri, uri_gpio_unexport))
   {
     ret = request_gpio_unexport;
-    ON_DEBUG(printf("request_gpio_unexport\n"));
+    ON_DEBUG(printf("request_gpio_unexport"));
   }
   else if (is_request(uri, uri_gpio_value_get))
   {
     ret = request_gpio_value_get;
-    ON_DEBUG(printf("request_gpio_value_get\n"));
+    ON_DEBUG(printf("request_gpio_value_get"));
   }
   else if (is_request(uri, uri_gpio_value_set))
   {
     ret = request_gpio_value_set;
-    ON_DEBUG(printf("request_gpio_value_set\n"));
+    ON_DEBUG(printf("request_gpio_value_set"));
   }
   else if (is_request(uri, uri_gpio_direction_get))
   {
     ret = request_gpio_direction_get;
-    ON_DEBUG(printf("request_gpio_direction_get\n"));
+    ON_DEBUG(printf("request_gpio_direction_get"));
   }
   else if (is_request(uri, uri_gpio_direction_set))
   {
     ret = request_gpio_direction_set;
-    ON_DEBUG(printf("request_gpio_direction_set\n"));
+    ON_DEBUG(printf("request_gpio_direction_set"));
   }
   else
   {
     ret = request_unknown;
-    ON_DEBUG(printf("request_unknown\n"));
+    ON_DEBUG(printf("request_unknown"));
   }
+  ON_DEBUG(printf("\n"));
   return ret;
 }
 
@@ -117,17 +135,18 @@ static int get_query_param(const char *param, const char *query, char *value, in
 
       i++;
     }
-
-    /* add the string termination */
-    value[value_index] = '\0';
   }
+
+  /* add the string termination */
+  value[value_index] = '\0';
+
   return value_index;
 }
 
 static int ev_handler(struct mg_connection *conn, enum mg_event ev)
 {
   static int request_num = 0;
-  char param_gpio[10], param_value[10], param_direction[10];
+  char param_gpio[10], param_value[10], param_direction[10], param_content[20];
   int gpio; int value = -1; bool input_value; gpio_direction_t direction;
   request_t req;
 
@@ -147,6 +166,8 @@ static int ev_handler(struct mg_connection *conn, enum mg_event ev)
       }
       if (get_query_param("direction", conn->query_string, param_direction, sizeof(param_direction)) > 0)
         ON_DEBUG(printf(" param direction: %s", param_direction));
+      if (get_query_param("content", conn->query_string, param_content, sizeof(param_content)) > 0)
+        ON_DEBUG(printf(" param content: %s", param_content));
       ON_DEBUG(printf("\n"));
 
       /* get the type of the request */
@@ -154,6 +175,25 @@ static int ev_handler(struct mg_connection *conn, enum mg_event ev)
 
       switch (req)
       {
+      case request_index:
+        mg_send_file(conn, "content/index.html", NULL);
+        return MG_MORE;
+        break;
+      case request_content:
+        int i;
+        char filename[255];
+
+        for (i = 0; i < content_file_count; i++)
+          if (strcmp(param_content, m_content_files[i]) == 0)
+          {
+            snprintf(filename, sizeof(filename)-1, "content/%s", m_content_files[i]);
+            ON_DEBUG(printf("serving content file: %s\n", filename))
+            mg_send_file(conn, filename, NULL);
+            return MG_MORE;
+          }
+        mg_send_data(conn, NULL, 0);
+        break;
+
       case request_gpio_get:
         mg_send_data(conn, NULL, 0);
         break;
@@ -259,6 +299,8 @@ void rpcp_test(void)
 
 int main(void)
 {
+  ON_DEBUG(printf("content file count: %i\n", content_file_count));
+
   struct mg_server *server = mg_create_server(NULL, ev_handler);
   mg_set_option(server, "listening_port", "8080");
 

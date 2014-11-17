@@ -8,6 +8,9 @@
     <Filter Include="mongoose">
       <UniqueIdentifier>{0544aed4-d216-42d7-9d25-62859eff98a1}</UniqueIdentifier>
     </Filter>
+    <Filter Include="content">
+      <UniqueIdentifier>{989849ba-c637-4d6b-bd34-3b05397d8dca}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\main.c">
@@ -31,5 +34,11 @@
   <ItemGroup>
     <None Include="build.bat" />
     <None Include="deploy.bat" />
+    <None Include="..\content\knockout-3.2.0.js">
+      <Filter>content</Filter>
+    </None>
+    <None Include="..\content\index.html">
+      <Filter>content</Filter>
+    </None>
   </ItemGroup>
 </Project>
