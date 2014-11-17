@@ -10,7 +10,7 @@ typedef struct {
 } config_t;
 
 static config_t m_config = { true };
-static const char *m_content_files[] = { "knockout-3.2.0.js" };
+static const char *m_content_files[] = { "index.html", "knockout-3.2.0.js" };
 #define content_file_count (sizeof(m_content_files)/sizeof(char*))
 
 #define uri_index              "/"
@@ -24,6 +24,7 @@ static const char *m_content_files[] = { "knockout-3.2.0.js" };
 #define uri_gpio_direction_set "/gpio/direction/set"
 
 #define is_request(uri,req) (strncmp(uri, req, sizeof(req)) == 0)
+#define starts_with_request(uri,req) (strncmp(uri, req, sizeof(req)-1) == 0)
 
 #define DEBUG 1
 #if DEBUG
@@ -54,7 +55,7 @@ static request_t get_request_type(const char *uri)
     ret = request_index;
     ON_DEBUG(printf("request_index"))
   }
-  else if (is_request(uri, uri_content))
+  else if (starts_with_request(uri, uri_content))
   {
     ret = request_content;
     ON_DEBUG(printf("request_content"));
@@ -143,11 +144,32 @@ static int get_query_param(const char *param, const char *query, char *value, in
   return value_index;
 }
 
+static int get_index_of(const char *string, const char c)
+{
+  int i;
+  if (string != NULL)
+    for (i = 0; string[i] != '\0'; i++)
+      if (string[i] == c)
+        return i;
+  return -1;
+}
+
+static int get_last_index_of(const char *string, const char c)
+{
+  int i, last_index = -1;
+  if (string != NULL)
+    for (i = 0; string[i] != '\0'; i++)
+      if (string[i] == c)
+        last_index = i;
+
+  return last_index;
+}
+
 static int ev_handler(struct mg_connection *conn, enum mg_event ev)
 {
   static int request_num = 0;
   char param_gpio[10], param_value[10], param_direction[10], param_content[20];
-  int gpio; int value = -1; bool input_value; gpio_direction_t direction;
+  int gpio, last_slash; int value = -1; bool input_value; gpio_direction_t direction;
   request_t req;
 
   switch (ev)
@@ -183,14 +205,20 @@ static int ev_handler(struct mg_connection *conn, enum mg_event ev)
         int i;
         char filename[255];
 
-        for (i = 0; i < content_file_count; i++)
-          if (strcmp(param_content, m_content_files[i]) == 0)
-          {
-            snprintf(filename, sizeof(filename)-1, "content/%s", m_content_files[i]);
-            ON_DEBUG(printf("serving content file: %s\n", filename))
-            mg_send_file(conn, filename, NULL);
-            return MG_MORE;
-          }
+        last_slash = get_last_index_of(conn->uri, '/');
+        //ON_DEBUG(printf("last_slash: %i\n", last_slash));
+
+        if (last_slash >= 0)
+          for (i = 0; i < content_file_count; i++)
+            if (strcmp(conn->uri + last_slash + 1, m_content_files[i]) == 0)
+            //if (strcmp(param_content, m_content_files[i]) == 0)
+            {
+              snprintf(filename, sizeof(filename)-1, "content/%s", m_content_files[i]);
+              ON_DEBUG(printf("serving content file: %s\n", filename))
+              mg_send_file(conn, filename, NULL);
+              return MG_MORE;
+            }
+
         mg_send_data(conn, NULL, 0);
         break;
 

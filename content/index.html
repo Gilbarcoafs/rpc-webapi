@@ -1,6 +1,6 @@
 <html>
 <head title="rpc+ web api">
-  <script src="content?content=knockout-3.2.0.js"></script>
+  <script src="knockout-3.2.0.js"></script>
 </head>
 
 <body>
@@ -19,7 +19,7 @@
   </ul>
   </div>
 
-  <div>
+<!--  <div>
   <h4>examples</h4>
   <ul>
     <li>export gpio 3: <a href="gpio/export?gpio=3">gpio/export?gpio=3</a></li>
@@ -31,10 +31,33 @@
     <li>set gpio 3 value low: <a href="gpio/value/set?gpio=3&value=0">gpio/value/set?gpio=3&value=0</a></li>
   </ul>
   </div>
-  
- <!--<script src="content/javascript"
-  <script type="text/javascript">
+-->
+  <div id="gpio_api">
+    <label>gpio:</label>
+    <input data-bind="value: gpio" />
+    <button data-bind="click: export_click()">export</button>
+    <button data-bind="click: unexport_click()">unexport</button>
+    <button data-bind="click: get_direction_click()">get direction</button>
+    <button data-bind="click: get_value_click()">get value</button>
+  </div>
 
-  </script>-->
+  <script type="text/javascript">
+  (function() {
+    var vm = {
+      gpio: ko.observable(2),
+      export_click: function () {
+      },
+      unexport_click: function() {
+      },
+      get_direction_click: function() {
+      },
+      get_value_click: function () {
+      }
+    };
+
+    ko.applyBindings(vm, document.getElementById('gpio_api'));
+  })();
+  </script>
+
 </body>
 </html>
