@@ -35,33 +35,34 @@
 -->
   <div id="gpio_api">
     <label>gpio</label>
-    <input data-bind="value: gpio" />
+    <select data-bind="options: gpio_values, value: gpio"></select>
     <div>
-      <button data-bind="click: export_click()">export</button>
-      <button data-bind="click: unexport_click()">unexport</button>
+      <button data-bind="click: export_click">export</button>
+      <button data-bind="click: unexport_click">unexport</button>
     </div>
     <div>
-      <button data-bind="click: get_direction_click()">get direction</button>
+      <button data-bind="click: get_direction_click">get direction</button>
       <label data-bind="text: direction"></label>
     </div>
     <div>
-      <button data-bind="click: set_direction_click()">set direction</button>
+      <button data-bind="click: set_direction_click">set direction</button>
       <select data-bind="options: direction_values, value: direction_new"></select>
     </div>
     <div>
-      <button data-bind="click: get_value_click()">get value</button>
+      <button data-bind="click: get_value_click">get value</button>
       <label data-bind="text: value"></label>
     </div>
     <div>
-      <button data-bind="click: set_value_click()">set value</button>
-      <select data-bind="options: output_values, value: value_new"></select>
+      <button data-bind="click: set_value_click, enable: direction() === 'out'">set value</button>
+      <select data-bind="options: output_values, value: value_new, enable: direction() === 'out'"></select>
     </div>
   </div>
 
   <script type="text/javascript">
-  (function() {
+  function getVm() {
     var vm = {
       gpio: ko.observable(2),
+      gpio_values: ko.observableArray([2, 3, 55, 56, 57, 58, 59, 60, 61, 62]),
       direction: ko.observable(''),
       direction_new: ko.observable(''),
       direction_values: ko.observableArray( ['in', 'out']),
@@ -81,13 +82,13 @@
       },
       set_direction_click: function () {
         $.ajax('/gpio/direction/set?gpio=' + vm.gpio() + '&direction=' + vm.direction_new(), { async: false });
-        vm.get_direction_click();
+        vm.update();
       },
       get_value_click: function () {
         $.ajax('/gpio/value/get?gpio=' + vm.gpio(), { async: true, success: function (data) { vm.value(data); } });
       },
       set_value_click: function () {
-        var url = '/gpio/value/set?gpio=' + vm.gpio() + '&value=' + ((vm.value_new() === 'in') ? '0' : '1');
+        var url = '/gpio/value/set?gpio=' + vm.gpio() + '&value=' + ((vm.value_new() === 'low') ? '0' : '1');
         $.ajax(url, { async: true });
         vm.get_value_click();
       },
@@ -98,10 +99,14 @@
       }
     };
 
+    vm.update();
     vm.gpio.subscribe(function (newValue) { vm.update(); });
 
-    ko.applyBindings(vm, document.getElementById('gpio_api'));
-  })();
+    return vm;
+  };
+
+  ko.applyBindings(getVm(), document.getElementById('gpio_api'));
+
   </script>
 
 </body>
