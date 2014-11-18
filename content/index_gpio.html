@@ -77,7 +77,7 @@
               <button type="button" class="btn btn-default" data-bind="click: get_value_click">get value</button>
               <label data-bind="text: (value() === '0') ? 'low' : (value() === '1' ) ? 'high' : '' "></label>
             </p>
-            
+
             <div class="row">
               <div class="col-sm-2">
                 <button type="button" class="btn btn-default" data-bind="click: set_value_click, enable: direction() === 'out'">set value</button>
@@ -86,7 +86,7 @@
                 <select class="form-control" data-bind="options: output_values, value: value_new, enable: direction() === 'out'"></select>
               </div>
             </div>
-            
+
             <p>
               <div class="alert alert-info" style="display:none" data-bind="visible: direction() !== 'out'"><b>Set as Output</b> Set the GPIO as an output before setting the value!</div>
             </p>
@@ -97,12 +97,12 @@
       <div class="panel panel-default">
         <div class="panel-heading"><b>GPIO functions</b></div>
         <div class="panel-body">
-          <p>export gpios, eg. <a href="/gpio/export?gpio=2">/gpio/export?gpio=2</a></p>
-          <p>unexport gpios</p>
-          <p>get direction</p>
-          <p>set direction</p>
-          <p>get value</p>
-          <p>set value</p>
+          <p>export gpio, eg. <a data-bind="text: export_link, attr: { href: export_link }"></a></p>
+          <p>unexport gpio <a data-bind="text: unexport_link, attr: { href: unexport_link }"></a></p>
+          <p>get direction <a data-bind="text: get_direction_link, attr: { href: get_direction_link }"></a></p>
+          <p>set direction <a data-bind="text: set_direction_link, attr: { href: set_direction_link }"></a></p>
+          <p>get value <a data-bind="text: get_value_link, attr: { href: get_value_link }"></a></p>
+          <p>set value <a data-bind="text: set_value_link, attr: { href: set_value_link }"></a></p>
         </div>
       </div>
     </div>
@@ -117,27 +117,28 @@
         direction_values: ko.observableArray( ['in', 'out']),
         value: ko.observable(''),
         value_new: ko.observable(''),
-        output_values: ko.observableArray( ['low', 'high'] ),
+        output_values: ko.observableArray(['low', 'high']),
+
         export_click: function () {
-          $.ajax('/gpio/export?gpio=' + vm.gpio(), { async: true });
+          $.ajax(vm.export_link(), { async: true });
           vm.update();
         },
         unexport_click: function () {
-          $.ajax('/gpio/unexport?gpio=' + vm.gpio(), {});
+          $.ajax(vm.unexport_link(), {});
           vm.update();
         },
         get_direction_click: function () {
-          $.ajax('/gpio/direction/get?gpio=' + vm.gpio(), { async: true, success: function (data) { vm.direction(data); } });
+          $.ajax(vm.get_direction_link(), { async: true, success: function (data) { vm.direction(data); } });
         },
         set_direction_click: function () {
-          $.ajax('/gpio/direction/set?gpio=' + vm.gpio() + '&direction=' + vm.direction_new(), { async: false });
+          $.ajax(vm.set_direction_link(), { async: false });
           vm.update();
         },
         get_value_click: function () {
-          $.ajax('/gpio/value/get?gpio=' + vm.gpio(), { async: true, success: function (data) { vm.value(data); } });
+          $.ajax(vm.get_value_link(), { async: true, success: function (data) { vm.value(data); } });
         },
         set_value_click: function () {
-          var url = '/gpio/value/set?gpio=' + vm.gpio() + '&value=' + ((vm.value_new() === 'low') ? '0' : '1');
+          var url = vm.set_value_link();
           $.ajax(url, { async: true });
           vm.get_value_click();
         },
@@ -147,6 +148,13 @@
           vm.get_value_click();
         }
       };
+
+      vm.export_link = ko.computed(function () { return '/gpio/export?gpio=' + vm.gpio(); });
+      vm.unexport_link = ko.computed(function () { return '/gpio/unexport?gpio=' + vm.gpio(); }),
+      vm.get_direction_link = ko.computed(function () { return '/gpio/direction/get?gpio=' + vm.gpio(); }),
+      vm.set_direction_link = ko.computed(function () { return '/gpio/direction/set?gpio=' + vm.gpio() + '&direction=' + vm.direction_new(); }),
+      vm.get_value_link = ko.computed(function () { return '/gpio/value/get?gpio=' + vm.gpio(); }),
+      vm.set_value_link = ko.computed(function () { return '/gpio/value/set?gpio=' + vm.gpio() + '&value=' + ((vm.value_new() === 'low') ? '0' : '1'); } ),
 
       vm.update();
       vm.gpio.subscribe(function (newValue) { vm.update(); });
