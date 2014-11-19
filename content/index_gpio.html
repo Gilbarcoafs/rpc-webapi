@@ -21,23 +21,9 @@
       </div>
     </nav>
 
-  <!--  <div>
-    <h4>examples</h4>
-    <ul>
-      <li>export gpio 3: <a href="gpio/export?gpio=3">gpio/export?gpio=3</a></li>
-      <li>unexport gpio 3: <a href="gpio/unexport?gpio=3">gpio/unexport?gpio=3</a></li>
-      <li>set gpio 3 direction out: <a href="gpio/direction/set?gpio=3&direction=out">gpio/direction/set?gpio=3&direction=out</a></li>
-      <li>set gpio 3 direction in: <a href="gpio/direction/set?gpio=3&direction=in">gpio/direction/set?gpio=3&direction=in</a></li>
-      <li>get gpio 3 value: <a href="gpio/value/get?gpio=3">gpio/value/get?gpio=3</a></li>
-      <li>set gpio 3 value high: <a href="gpio/value/set?gpio=3&value=1">gpio/value/set?gpio=3&value=1</a></li>
-      <li>set gpio 3 value low: <a href="gpio/value/set?gpio=3&value=0">gpio/value/set?gpio=3&value=0</a></li>
-    </ul>
-    </div>
-  -->
-
     <div class="container">
       <h2>GPIOs</h2>
-      <p>The gpio web api interface allows controlling the gpios using simple GET requests.</p>
+      <p>The gpio web api interface allows controlling the gpios using simple GET requests. The get requests are shown on the right side.</p>
       <p>Click the buttons below to try them out!</p>
     </div>
 
@@ -45,64 +31,88 @@
 
       <div class="panel panel-default">
         <div class="panel-heading">
-        <div class="row">
-          <div class="col-sm-3">
-            <div>
-              <b>Configure the GPIO</b>
+          <div class="row">
+            <div class="col-sm-4">
+              <div>
+                <h4>Configure GPIO</h4>
+              </div>
+            </div>
+            <div class="col-sm-3">
+              <select id="selectGPIO" class="form-control" data-bind="options: gpio_values, value: gpio" ></select>
             </div>
           </div>
-          <div class="col-sm-3">
-            <select id="selectGPIO" class="form-control" data-bind="options: gpio_values, value: gpio" ></select>
-          </div>
-        </div>
         </div>
         <div class="panel-body">
-          <p class="btn-group" >
-            <p><button type="button" class="btn btn-default" data-bind="click: export_click">export</button></p>
-            <p><button type="button" class="btn btn-default" data-bind="click: unexport_click">unexport</button></p>
-            <p>
-              <button type="button" class="btn btn-default" data-bind="click: get_direction_click">get direction</button>
-              <label data-bind="text: direction"></label>
-              <span class="alert alert-info" style="display:none" data-bind="visible: direction() === ''"><b>Export the GPIO</b> Export the gpio before getting the direction!</span>
-            </p>
+          <div>
+            <form class="form-horizontal" role="form">
 
-            <p>
-              <button type="button" class="btn btn-default col-sm-4" data-bind="click: set_direction_click">set direction</button>
-              <p class="col-sm-3">
-                <select class="form-control" data-bind="options: direction_values, value: direction_new"></select>
-              </p>
-            </p>
-
-            <p>
-              <button type="button" class="btn btn-default" data-bind="click: get_value_click">get value</button>
-              <label data-bind="text: (value() === '0') ? 'low' : (value() === '1' ) ? 'high' : '' "></label>
-            </p>
-
-            <div class="row">
-              <div class="col-sm-2">
-                <button type="button" class="btn btn-default" data-bind="click: set_value_click, enable: direction() === 'out'">set value</button>
+              <div class="form-group">
+                <div class="col-sm-2">
+                  <button type="button" class="btn btn-default" data-bind="click: export_click">export</button>
+                </div>
               </div>
-              <div class="col-sm-4">
-                <select class="form-control" data-bind="options: output_values, value: value_new, enable: direction() === 'out'"></select>
-              </div>
-            </div>
 
-            <p>
-              <div class="alert alert-info" style="display:none" data-bind="visible: direction() !== 'out'"><b>Set as Output</b> Set the GPIO as an output before setting the value!</div>
-            </p>
+              <div class="form-group">
+                <div class="col-sm-2">
+                  <button type="button" class="btn btn-default" data-bind="click: unexport_click">unexport</button>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <div class="col-sm-2">
+                  <button type="button" class="btn btn-default" data-bind="click: get_direction_click">get direction</button>
+                </div>
+                <div class="col-sm-2">
+                  <label data-bind="text: direction"></label>
+                </div>
+                <div>
+                  <span class="alert alert-info" style="display:none" data-bind="visible: direction() === ''"><b>Export the GPIO</b> Export the gpio before getting the direction!</span>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <div class="col-sm-2">
+                  <button type="button" class="btn btn-default" data-bind="click: set_direction_click">set direction</button>
+                </div>
+                <div class="col-sm-3">
+                  <select class="form-control" data-bind="options: direction_values, value: direction_new"></select>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <div class="col-sm-2">
+                  <button type="button" class="btn btn-default" data-bind="click: get_value_click">get value</button>
+                </div>
+                <div class="col-sm-2">
+                  <label data-bind="text: (value() === '0') ? 'low' : (value() === '1' ) ? 'high' : '' "></label>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <div class="col-sm-2">
+                  <button type="button" class="btn btn-default" data-bind="click: set_value_click, enable: direction() === 'out'">set value</button>
+                </div>
+                <div class="col-sm-2">
+                  <select class="form-control" data-bind="options: output_values, value: value_new, enable: direction() === 'out'"></select>
+                </div>
+                <div class="alert alert-info col-sm-7" style="display:none" data-bind="visible: direction() !== 'out'"><b>Set as Output</b> Set the GPIO as an output before setting the value!</div>
+              </div>
+
+            </form>
           </div>
         </div>
       </div>
 
       <div class="panel panel-default">
-        <div class="panel-heading"><b>GPIO functions</b></div>
+        <div class="panel-heading"><h4>GPIO functions</h4></div>
         <div class="panel-body">
-          <p>export gpio, eg. <a data-bind="text: export_link, attr: { href: export_link }"></a></p>
-          <p>unexport gpio <a data-bind="text: unexport_link, attr: { href: unexport_link }"></a></p>
-          <p>get direction <a data-bind="text: get_direction_link, attr: { href: get_direction_link }"></a></p>
-          <p>set direction <a data-bind="text: set_direction_link, attr: { href: set_direction_link }"></a></p>
-          <p>get value <a data-bind="text: get_value_link, attr: { href: get_value_link }"></a></p>
-          <p>set value <a data-bind="text: set_value_link, attr: { href: set_value_link }"></a></p>
+          <p>The buttons in the panel above use the following simple GET requests to achieve their goal:</p>
+          <p><b>export gpio</b> <a data-bind="text: export_link, attr: { href: export_link }"></a></p>
+          <p><b>unexport gpio</b> <a data-bind="text: unexport_link, attr: { href: unexport_link }"></a></p>
+          <p><b>get direction</b> <a data-bind="text: get_direction_link, attr: { href: get_direction_link }"></a></p>
+          <p><b>set direction</b> <a data-bind="text: set_direction_link, attr: { href: set_direction_link }"></a></p>
+          <p><b>get value</b> <a data-bind="text: get_value_link, attr: { href: get_value_link }"></a></p>
+          <p><b>set value</b> <a data-bind="text: set_value_link, attr: { href: set_value_link }"></a></p>
         </div>
       </div>
     </div>
