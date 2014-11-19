@@ -1,4 +1,5 @@
 /* written by mdk at amescon.com */
+#include <stdbool.h>
 #include <stdint.h>
 
 /* gpio functions */
