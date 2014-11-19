@@ -172,6 +172,8 @@ static int ev_handler(struct mg_connection *conn, enum mg_event ev)
   char param_gpio[10], param_value[10], param_direction[10], param_content[20];
   int gpio, last_slash; int value = -1; bool input_value; gpio_direction_t direction;
   request_t req;
+  int i;
+  char filename[255];
 
   switch (ev)
   {
@@ -203,8 +205,6 @@ static int ev_handler(struct mg_connection *conn, enum mg_event ev)
         return MG_MORE;
         break;
       case request_content:
-        int i;
-        char filename[255];
 
         last_slash = get_last_index_of(conn->uri, '/');
         //ON_DEBUG(printf("last_slash: %i\n", last_slash));
