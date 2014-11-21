@@ -1,4 +1,5 @@
-/* written by mdk at amescon.com */
+/* author: martin.kramer at amescon.com 
+   license: this file is release under the FreeBSD License */
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
