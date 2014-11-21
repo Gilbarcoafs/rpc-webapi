@@ -1,0 +1,26 @@
+Description
+
+  The RasPiComm+ WebApi is a WebServer that allows remote controlling your raspberry pi and RasPiComm+ by issuing GET requests.
+
+
+Setup & run the WebApi
+
+  Execute the following commands on your raspberry pi:
+
+  git clone https://github.com/amescon/rpc-webapi.git
+  cd rpc-webapi
+  make
+  ./rpc+webapi
+
+
+Use the WebApi
+
+  Open your favourite browser and point it to http://[INSERT RASPBERRYPI IP HERE]:8080/
+
+
+License
+
+  mongoose.h & mongoose.c is third pary software licensed under the GPL.
+
+  All other C and Header files are written by martin kramer at amescon.com and released under the FreeBSD License as well as the GPL.
+
