@@ -201,8 +201,9 @@ static int ev_handler(struct mg_connection *conn, enum mg_event ev)
       switch (req)
       {
       case request_index:
-        mg_printf(conn, "HTTP/1.1 301 Moved Permanently\r\nLocation: %s\r\n", "/content/index.html");
-        return MG_TRUE;
+        mg_send_status(conn, 301);
+        mg_send_header(conn, "Location", "/content/index.html");
+        return MG_FALSE;
         break;
       case request_content:
 
@@ -285,7 +286,7 @@ static int ev_handler(struct mg_connection *conn, enum mg_event ev)
 
       return MG_TRUE;
       //return MG_MORE; /* return MG_MORE when using mg_send_file() */
-      
+
       break;
 
     case MG_AUTH: return MG_TRUE;
